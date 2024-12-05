@@ -26,7 +26,7 @@ def generatebarcode(req: func.HttpRequest) -> func.HttpResponse:
         # Create the barcode with an ImageWriter to generate an image
 
         # this determines what is let through to be converted to a barcode
-        if len(barcode_number) != 14 or barcode_number[1:12].isprintable() == False:
+        if len(barcode_number) != 14 or barcode_number.isprintable() == False:
             raise func.HTTPException(status_code=400, detail="EAN-13 barcode number must be 12 digits long.")
         
         ean = barcode.get(BARCODE_TYPE, barcode_number, writer=ImageWriter(format="PNG"))
