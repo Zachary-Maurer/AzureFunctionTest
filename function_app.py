@@ -7,6 +7,7 @@ from barcode.writer import ImageWriter
 
 app = func.FunctionApp(
     #http_auth_level=func.AuthLevel.ANONYMOUS
+    #requires that you attach a key
     http_auth_level=func.AuthLevel.FUNCTION
     )
 
@@ -22,11 +23,10 @@ def generatebarcode(req: func.HttpRequest) -> func.HttpResponse:
     barcode_number = req.route_params.get('barcodenumber')
 
     try:
-
-    #if(1):
         # Create the barcode with an ImageWriter to generate an image
 
-        if len(barcode_number) != 14 or barcode_number[1:12].isalnum() == False:
+        # this determines what is let through to be converted to a barcode
+        if len(barcode_number) != 14 or barcode_number[1:12].isprintable() == False:
             raise func.HTTPException(status_code=400, detail="EAN-13 barcode number must be 12 digits long.")
         
         ean = barcode.get(BARCODE_TYPE, barcode_number, writer=ImageWriter(format="PNG"))
@@ -54,6 +54,7 @@ def generatebarcode(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             barcode_io.getvalue()
             ,mimetype='image/png'
+            #determines the file name
             ,headers = {"Content-Disposition": "attachment; filename=barcode.png"}
             )
     
